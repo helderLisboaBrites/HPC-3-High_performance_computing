@@ -5,7 +5,7 @@
 int main(int argc, char const *argv[])
 {
     /**
-     * Programme qui divise en 4 tâches openMP, chacune affichera son numéro de rang
+     * Programme teste les Variables privées
      * 
      * */
     omp_set_num_threads(4);
