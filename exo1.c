@@ -1,7 +1,6 @@
 #include <omp.h>
 #include <stdio.h>
 
-
 int main(int argc, char const *argv[])
 {
     /**
@@ -12,7 +11,7 @@ int main(int argc, char const *argv[])
     #pragma omp parallel
     {
         int nbr = omp_get_thread_num();
-        printf("nombre de thread est %d\n", nbr);
+        printf("Numéro de thread est %d\n", nbr);
     }
     return 0;
 }

@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
      * 
      * */
     
-    omp_set_num_threads(8);
+    omp_set_num_threads(4);
     #ifdef FOR_PARA1
     for(int i = 1 ; i <= 50; i++ ){
         printf("Valeur i = %d\n",i);
