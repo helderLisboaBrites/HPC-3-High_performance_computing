@@ -115,3 +115,82 @@ void writeimg(char *filename, float *im, int rs, int cs, int vs)
     }      
   fclose(fd_out);
 }
+
+
+void f(float * u,float deltaT, int size)
+{
+    float* u_tmp = (float*) calloc(size, sizeof(float));
+
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    for(int x = 1; x<size-1; x++ )
+    {
+        u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
+ 
+    }
+    /*
+    printf(" ----\n ");
+    //print tableau valeurs
+    for(int i =0; i<size; i++){
+        printf(" %.3f ", u_tmp[i]);
+    }
+    printf("---- \n ");
+*/
+    //copie tableau
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+    }
+
+    free(u_tmp);
+}
+
+
+
+
+void f2(float ** u, float  deltaT,int size )
+{
+  float** u_tmp = (float**) calloc(size, sizeof(float*));
+  for(int i = 0; i<size; i++) u_tmp[i] = calloc(size, sizeof(float));
+
+  //calcul 
+  for(int x = 0; x<size; x++ )
+  {
+    for(int y = 0; y<size; y++ )
+    {
+      if(x == 0 && y == 0)
+      {
+        u_tmp[x][y] = 0;
+      }
+      else if(x == 0)
+      {
+        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + 0)/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+      }
+      else if(y==0)
+      {
+        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+0)/2;
+      }
+      else
+      {
+        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+      }
+    }
+  }
+  /*
+  printf(" ----\n ");
+  //print tableau valeurs
+  for(int i =0; i<size; i++){
+      printf(" %.3f ", u_tmp[i]);
+  }
+  printf("---- \n ");
+*/
+  //copie tableau
+  for(int x = 0; x<size; x++ )
+  {
+      u[x]=u_tmp[x];
+  }
+
+  free(u_tmp);
+
+}
