@@ -23,6 +23,8 @@ typedef unsigned char uint8;
 float * readimg(char *, int *, int *, int *);
 void writeimg(char *, float *, int , int, int);
 
+float * readFromData(char *, int );
+void printArray(float* , int );
 void f_1D(float *, float ,int  );
 
 void f_1D_parallele(float *, float ,int  );

@@ -18,7 +18,7 @@
 int main (int argc, char *argv[])
 {
  
- /*
+
   // noms des fichiers d'entrée et de sortie
   char *filename=argv[1];
   char *file_out=argv[2];
@@ -43,8 +43,8 @@ int main (int argc, char *argv[])
   //-------------------------------------------------------------
   // OPEN DATA FILE AND ALLOCATE INPUT IMAGE MEMORY (float precision)
   //-------------------------------------------------------------
-  T = readimg(filename, &rw, &cl, &v);
-  Tdt = (float *) calloc (rw*cl,sizeof(float));
+  //T = readimg(filename, &rw, &cl, &v);
+  //Tdt = (float *) calloc (rw*cl,sizeof(float));
 
   //-------------------------------------------------------------
   // PUT HERE THE NUMERICAL SOLUTION OF HEAT EQUATION
@@ -55,12 +55,14 @@ int main (int argc, char *argv[])
   int it;
   float dt = 0.01;
   memcpy(Tdt,T,sizeof(float)*rw*cl);
-   */
+   
   double  t0 = omp_get_wtime();     
 
   // A COMPLETER SELON LE DERNIER COURS :-)
-    float u[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
-    int size = 21;
+    int size = 100000;
+    float* u = readFromData(filename, size);
+    float* u1 = readFromData(filename, size);
+    
     int tempsTotal = 2;
     float deltaT=0.001;
     for(float i = 0; i <= 2; i+=deltaT)
@@ -68,11 +70,10 @@ int main (int argc, char *argv[])
         f_1D(u,deltaT,size);
     }
 
+
     //print tableau valeurs
-    for(int i =0; i<size; i++){
-        printf(" %.3f ", u[i]);
-    }
-    printf(" \n ");
+    //printArray(u,size);
+    
 
     
     double  t1 = omp_get_wtime();
@@ -81,17 +82,13 @@ int main (int argc, char *argv[])
 
     t0 = omp_get_wtime();     
 
-    float u1[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
     for(float i = 0; i <= 2; i+=deltaT)
     {
         f_1D_parallele(u1,deltaT,size);
     }
 
     //print tableau valeurs
-    for(int i =0; i<size; i++){
-        printf(" %.3f ", u1[i]);
-    }
-    printf(" \n ");
+    //printArray(u,size);
 
    
     t1 = omp_get_wtime ();

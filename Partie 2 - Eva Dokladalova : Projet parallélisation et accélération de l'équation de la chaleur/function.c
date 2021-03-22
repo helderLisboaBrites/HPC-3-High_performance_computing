@@ -158,6 +158,7 @@ void f_1D_parallele(float * u,float deltaT, int size)
     for(int x = 0; x<size; x++ )
     {
         u[x]=u_tmp[x];
+        //memcpy
     }
 
     free(u_tmp);
@@ -210,4 +211,45 @@ void f2(float ** u, float  deltaT,int size )
 
   free(u_tmp);
 
+}
+
+
+
+float* readFromData(char *filename, int rs){
+    FILE *fd = NULL;
+
+    // open input file 
+    fd = fopen(filename,"r");
+    if (fd==NULL)
+    {
+        fprintf(stderr, "Input image reading failed)\n");
+        return (0);
+    }
+
+    float* im = (float *) calloc (rs,sizeof(float));
+    if (im==NULL)
+    {
+        fprintf(stderr, "Data allocation (failed %d) bytes)\n", rs);
+        return (0);
+    }
+
+    // data initialization
+    int N = rs*sizeof(float);
+    float c;
+    for (int i=0; i<rs;i++)
+    {
+        fscanf(fd, "%f", &c);
+        im[i]=(float) c;
+    }
+    return (im);
+}
+
+
+
+void printArray(float* u, int size){
+        //print tableau valeurs
+    for(int i =0; i<size; i++){
+        printf(" %.3f ", u[i]);
+    }
+    printf(" \n ");
 }
