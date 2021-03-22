@@ -18,6 +18,7 @@
 int main (int argc, char *argv[])
 {
  
+ /*
   // noms des fichiers d'entrée et de sortie
   char *filename=argv[1];
   char *file_out=argv[2];
@@ -44,7 +45,7 @@ int main (int argc, char *argv[])
   //-------------------------------------------------------------
   T = readimg(filename, &rw, &cl, &v);
   Tdt = (float *) calloc (rw*cl,sizeof(float));
- 
+
   //-------------------------------------------------------------
   // PUT HERE THE NUMERICAL SOLUTION OF HEAT EQUATION
   // complete variables necessary for for the numerical scheme computing
@@ -54,7 +55,8 @@ int main (int argc, char *argv[])
   int it;
   float dt = 0.01;
   memcpy(Tdt,T,sizeof(float)*rw*cl);
-  double  t0 = omp_get_wtime ();     
+   */
+  double  t0 = omp_get_wtime();     
 
   // A COMPLETER SELON LE DERNIER COURS :-)
     float u[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
@@ -63,7 +65,7 @@ int main (int argc, char *argv[])
     float deltaT=0.001;
     for(float i = 0; i <= 2; i+=deltaT)
     {
-        f(u,deltaT,size);
+        f_1D(u,deltaT,size);
     }
 
     //print tableau valeurs
@@ -71,17 +73,39 @@ int main (int argc, char *argv[])
         printf(" %.3f ", u[i]);
     }
     printf(" \n ");
-  
+
+    
+    double  t1 = omp_get_wtime();
+    double  temps_reel=t1-t0;
+    printf( " temps  reel %lf : \n", temps_reel);
+
+    t0 = omp_get_wtime();     
+
+    float u1[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
+    for(float i = 0; i <= 2; i+=deltaT)
+    {
+        f_1D_parallele(u1,deltaT,size);
+    }
+
+    //print tableau valeurs
+    for(int i =0; i<size; i++){
+        printf(" %.3f ", u1[i]);
+    }
+    printf(" \n ");
+
    
-  double  t1 = omp_get_wtime ();
-  double  temps_reel=t1-t0;
-  printf( " temps  reel %lf : \n", temps_reel);
-  
+    t1 = omp_get_wtime ();
+    temps_reel=t1-t0;
+    printf( " temps  reel %lf : \n", temps_reel);
+
+
+  /*
   //-------------------------------------------------------------
   // WRITE RESULT IN A PGN IMAGE 
   //-------------------------------------------------------------
    writeimg(file_out, Tdt, rw, cl, v);
    free(Tdt);
    free(T);
+   */
    return(0);
 }

@@ -6,7 +6,7 @@
  */
 
 #include "function.h"
-
+#include "omp.h"
 //------------------------------------------------------------------
 // ONLY FOR PGN IMAGES type P2 !!!
 //------------------------------------------------------------------
@@ -117,7 +117,7 @@ void writeimg(char *filename, float *im, int rs, int cs, int vs)
 }
 
 
-void f(float * u,float deltaT, int size)
+void f_1D(float * u,float deltaT, int size)
 {
     float* u_tmp = (float*) calloc(size, sizeof(float));
 
@@ -129,15 +129,32 @@ void f(float * u,float deltaT, int size)
         u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
  
     }
-    /*
-    printf(" ----\n ");
-    //print tableau valeurs
-    for(int i =0; i<size; i++){
-        printf(" %.3f ", u_tmp[i]);
-    }
-    printf("---- \n ");
-*/
+
     //copie tableau
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+    }
+
+    free(u_tmp);
+}
+
+void f_1D_parallele(float * u,float deltaT, int size)
+{
+    float* u_tmp = (float*) calloc(size, sizeof(float));
+
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    omp_set_num_threads(4);
+    #pragma omp parallel for 
+    for(int x = 1; x<size-1; x++ )
+    {
+        u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
+    }
+    
+    //copie tableau
+    #pragma omp parallel for
     for(int x = 0; x<size; x++ )
     {
         u[x]=u_tmp[x];
