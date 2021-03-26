@@ -167,15 +167,15 @@ void f_1D_parallele(float * u,float deltaT, int size)
 
 
 
-void f2(float ** u, float  deltaT,int size )
+void f_2D(float ** u, float  deltaT,int Xsize,int Ysize )
 {
-  float** u_tmp = (float**) calloc(size, sizeof(float*));
-  for(int i = 0; i<size; i++) u_tmp[i] = calloc(size, sizeof(float));
+  float** u_tmp = (float**) calloc(Xsize, sizeof(float*));
+  for(int i = 0; i<Xsize; i++) u_tmp[i] = calloc(Ysize, sizeof(float));
 
   //calcul 
-  for(int x = 0; x<size; x++ )
+  for(int x = 0; x<Xsize-1; x++ )
   {
-    for(int y = 0; y<size; y++ )
+    for(int y = 0; y<Ysize-1; y++ )
     {
       if(x == 0 && y == 0)
       {
@@ -183,15 +183,15 @@ void f2(float ** u, float  deltaT,int size )
       }
       else if(x == 0)
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + 0)/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y-1]))/2;
       }
       else if(y==0)
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+0)/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y]))/2;
       }
       else
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y-1]))/2;
       }
     }
   }
@@ -204,13 +204,19 @@ void f2(float ** u, float  deltaT,int size )
   printf("---- \n ");
 */
   //copie tableau
-  for(int x = 0; x<size; x++ )
+  for(int x = 0; x<Xsize; x++ )
   {
-      u[x]=u_tmp[x];
+      for(int y = 0; y<Ysize; y++ )
+  {
+      u[x][y]=u_tmp[x][y];
   }
 
-  free(u_tmp);
+  }
 
+  for (int i = 0; i < Xsize; i++){  
+   free(u_tmp[i]);  
+  }  
+  free(u_tmp);  
 }
 
 
@@ -246,10 +252,20 @@ float* readFromData(char *filename, int rs){
 
 
 
-void printArray(float* u, int size){
+void print_1D_Array(float* u, int size){
         //print tableau valeurs
     for(int i =0; i<size; i++){
         printf(" %.3f ", u[i]);
+    }
+    printf(" \n ");
+}
+
+void print_2D_Array(float** u, int Xsize,int Ysize){
+        //print tableau valeurs
+    for(int i =0; i<Xsize; i++){
+      for(int j = 0; j<Ysize; j++)
+        printf(" %.3f ", u[i][j]);
+       printf(" \n ");
     }
     printf(" \n ");
 }
