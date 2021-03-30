@@ -19,8 +19,16 @@ typedef unsigned char uint8;
 // function declarations
 float * readimg(char *, int *, int *, int *);
 void writeimg(char *, float *, int , int, int);
-void f(float *, float ,int  );
-void f2(float **, float ,int  );
+
+float * readFromData(char *, int );
+void print_1D_Array(float* , int );
+void f_1D(float *, float ,int  );
+
+void f_1D_parallele(float *, float ,int  );
+
+void f_2D(float **, float ,int,int  );
+
+void print_2D_Array(float** , int ,int);
 #endif
 
 

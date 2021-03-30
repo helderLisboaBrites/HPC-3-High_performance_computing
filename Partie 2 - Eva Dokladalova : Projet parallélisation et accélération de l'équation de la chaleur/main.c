@@ -23,7 +23,7 @@ int main (int argc, char *argv[])
   char *file_out=argv[2];
   // pointeurs vers les matrices pour l'intégration temporelle
   float *T;
-  float *Tdt;
+  float **Tdt;
   float *swap;
   // dimension de matrice, valeur maximale
   int v;  // max  value in matrix
@@ -39,8 +39,13 @@ int main (int argc, char *argv[])
   // OPEN DATA FILE AND ALLOCATE INPUT IMAGE MEMORY (float precision)
   //-------------------------------------------------------------
   T = readimg(filename, &rw, &cl, &v);
-  Tdt = (float *) calloc (rw*cl,sizeof(float));
- 
+  // allocation de 
+  Tdt = (float **) calloc (rw,sizeof(float*));
+  for(int i = 0; i<rw; i++){ 
+    Tdt[i] = calloc(cl, sizeof(float));
+    memcpy(Tdt[i],&T[i*cl],sizeof(float)*cl);
+    }
+  //print_2D_Array(Tdt,rw,cl);
   //-------------------------------------------------------------
   // PUT HERE THE NUMERICAL SOLUTION OF HEAT EQUATION
   // complete variables necessary for for the numerical scheme computing
@@ -69,18 +74,84 @@ int main (int argc, char *argv[])
     double t1 = omp_get_wtime();
     float u[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
     int size = 21;
+  //memcpy(Tdt,T,sizeof(float)*rw*cl);
+
+  //double  t0 = omp_get_wtime();     
+
+  // A COMPLETER SELON LE DERNIER COURS :-)
+
+    
     int tempsTotal = 2;
     float deltaT=0.001;
+       /*
+           int size = 100000;
+    float* u = readFromData(filename, size);
+    float* u1 = readFromData(filename, size);
     for(float i = 0; i <= 2; i+=deltaT)
     {
-        f(u,deltaT,size);
+        f_1D(u,deltaT,size);
     }
 
+
     //print tableau valeurs
-    for(int i =0; i<size; i++){
-        printf(" %.3f ", u[i]);
+    //printArray(u,size);
+    
+
+    
+    double  t1 = omp_get_wtime();
+    double  temps_reel=t1-t0;
+    printf( " temps  reel : %lf \n", temps_reel);
+
+    t0 = omp_get_wtime();     
+
+    for(float i = 0; i <= 2; i+=deltaT)
+    {
+        f_1D_parallele(u1,deltaT,size);
     }
     printf(" \n ");
     double t2 = omp_get_wtime();
     printf("Temps Total = %lf\n", t2-t1);
+
+    //print tableau valeurs
+    //printArray(u,size);
+
+   
+    t1 = omp_get_wtime ();
+    temps_reel=t1-t0;
+    printf( " temps  reel : %lf \n", temps_reel);
+
+     size=10;
+    float** u_tmp = (float**) calloc(size, sizeof(float*));
+    for(int i = 0; i<size; i++) u_tmp[i] = calloc(size, sizeof(float));
+    int moit =(int)size/2;
+    u_tmp[moit][moit]=255;
+    print_2D_Array(u_tmp,size,size);
+    for(float i = 0; i <= 2; i+=deltaT)
+    {
+      f_2D(u_tmp,deltaT,size,size);
+    }
+    print_2D_Array(u_tmp,size,size);
+
+    /**
+
+    for(float i = 0; i <= 2; i+=deltaT)
+    {
+      f_2D(Tdt,deltaT,rw,cl);
+    }
+    //print_2D_Array(Tdt,rw,cl);
+
+
+  
+  //-------------------------------------------------------------
+  // WRITE RESULT IN A PGN IMAGE 
+  //-------------------------------------------------------------
+   float * array =(float*) calloc(rw*cl,sizeof(float));
+   for(int i = 0; i<rw; i++){
+     memcpy(&array[i*cl],Tdt[i],sizeof(float)*cl);
+   }
+   writeimg(file_out, array, rw, cl, v);
+   free(Tdt);
+   free(T);
+   **/
+   return(0);
 }

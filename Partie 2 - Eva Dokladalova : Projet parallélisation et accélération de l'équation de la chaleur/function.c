@@ -117,7 +117,7 @@ void writeimg(char *filename, float *im, int rs, int cs, int vs)
 }
 
 
-void f(float * u,float deltaT, int size)
+void f_1D(float * u,float deltaT, int size)
 {
     float* u_tmp = (float*) calloc(size, sizeof(float));
 
@@ -129,14 +129,7 @@ void f(float * u,float deltaT, int size)
         u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
  
     }
-    /*
-    printf(" ----\n ");
-    //print tableau valeurs
-    for(int i =0; i<size; i++){
-        printf(" %.3f ", u_tmp[i]);
-    }
-    printf("---- \n ");
-*/
+
     //copie tableau
     for(int x = 0; x<size; x++ )
     {
@@ -146,18 +139,43 @@ void f(float * u,float deltaT, int size)
     free(u_tmp);
 }
 
-
-
-
-void f2(float ** u, float  deltaT,int size )
+void f_1D_parallele(float * u,float deltaT, int size)
 {
-  float** u_tmp = (float**) calloc(size, sizeof(float*));
-  for(int i = 0; i<size; i++) u_tmp[i] = calloc(size, sizeof(float));
+    float* u_tmp = (float*) calloc(size, sizeof(float));
+
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    omp_set_num_threads(4);
+    #pragma omp parallel for 
+    for(int x = 1; x<size-1; x++ )
+    {
+        u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
+    }
+    
+    //copie tableau
+    #pragma omp parallel for
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+        //memcpy
+    }
+
+    free(u_tmp);
+}
+
+
+
+
+void f_2D(float ** u, float  deltaT,int Xsize,int Ysize )
+{
+  float** u_tmp = (float**) calloc(Xsize, sizeof(float*));
+  for(int i = 0; i<Xsize; i++) u_tmp[i] = calloc(Ysize, sizeof(float));
 
   //calcul 
-  for(int x = 0; x<size; x++ )
+  for(int x = 0; x<Xsize-1; x++ )
   {
-    for(int y = 0; y<size; y++ )
+    for(int y = 0; y<Ysize-1; y++ )
     {
       if(x == 0 && y == 0)
       {
@@ -165,15 +183,15 @@ void f2(float ** u, float  deltaT,int size )
       }
       else if(x == 0)
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + 0)/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y-1]))/2;
       }
       else if(y==0)
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+0)/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y]))/2;
       }
       else
       {
-        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + deltaT*(u[x][y+1]-2*u[x][y]+u[x][y-1])/2;
+        u_tmp[x][y] = u[x][y]+ deltaT*((u[x+1][y]- 2*u[x][y] + u[x-1][y])/2 + (u[x][y+1]-2*u[x][y]+u[x][y-1]))/2;
       }
     }
   }
@@ -186,11 +204,68 @@ void f2(float ** u, float  deltaT,int size )
   printf("---- \n ");
 */
   //copie tableau
-  for(int x = 0; x<size; x++ )
+  for(int x = 0; x<Xsize; x++ )
   {
-      u[x]=u_tmp[x];
+      for(int y = 0; y<Ysize; y++ )
+  {
+      u[x][y]=u_tmp[x][y];
   }
 
-  free(u_tmp);
+  }
 
+  for (int i = 0; i < Xsize; i++){  
+   free(u_tmp[i]);  
+  }  
+  free(u_tmp);  
+}
+
+
+
+float* readFromData(char *filename, int rs){
+    FILE *fd = NULL;
+
+    // open input file 
+    fd = fopen(filename,"r");
+    if (fd==NULL)
+    {
+        fprintf(stderr, "Input image reading failed)\n");
+        return (0);
+    }
+
+    float* im = (float *) calloc (rs,sizeof(float));
+    if (im==NULL)
+    {
+        fprintf(stderr, "Data allocation (failed %d) bytes)\n", rs);
+        return (0);
+    }
+
+    // data initialization
+    int N = rs*sizeof(float);
+    float c;
+    for (int i=0; i<rs;i++)
+    {
+        fscanf(fd, "%f", &c);
+        im[i]=(float) c;
+    }
+    return (im);
+}
+
+
+
+void print_1D_Array(float* u, int size){
+        //print tableau valeurs
+    for(int i =0; i<size; i++){
+        printf(" %.3f ", u[i]);
+    }
+    printf(" \n ");
+}
+
+void print_2D_Array(float** u, int Xsize,int Ysize){
+        //print tableau valeurs
+    for(int i =0; i<Xsize; i++){
+      for(int j = 0; j<Ysize; j++)
+        printf(" %.3f ", u[i][j]);
+       printf(" \n ");
+    }
+    printf(" \n ");
 }
