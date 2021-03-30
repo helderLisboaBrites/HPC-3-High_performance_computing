@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
   //-------------------------------------------------------------
   // OPEN DATA FILE AND ALLOCATE INPUT IMAGE MEMORY (float precision)
   //-------------------------------------------------------------
-  T = readimg(filename, &rw, &cl, &v);
+  T = readimg(filename, &cl, &rw, &v);
   // allocation de 
   Tdt = (float **) calloc (rw,sizeof(float*));
   for(int i = 0; i<rw; i++){ 
@@ -116,7 +116,7 @@ int main (int argc, char *argv[])
 
     */
 
-    for(float i = 0; i <= 2; i+=deltaT)
+    for(float i = 0; i <= 5; i+=deltaT)
     {
       f_2D(Tdt,deltaT,rw,cl);
     }
@@ -131,7 +131,16 @@ int main (int argc, char *argv[])
    for(int i = 0; i<rw; i++){
      memcpy(&array[i*cl],Tdt[i],sizeof(float)*cl);
    }
-   writeimg(file_out, array, rw, cl, v);
+   /*
+   print_2D_Array(Tdt,rw,cl);
+   for(int i=0; i<rw; i++){
+     for (int j=0; j<cl;j++)
+        printf("%.3f, ",array[i*cl+j]);
+      printf("\n");
+   }
+   printf("%d -- %d\n", rw,cl);
+   */
+   writeimg(file_out, array, cl, rw, v);
    free(Tdt);
    free(T);
    
