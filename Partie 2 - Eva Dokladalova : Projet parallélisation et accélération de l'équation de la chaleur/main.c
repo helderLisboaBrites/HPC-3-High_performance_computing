@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "omp.h"
+#include <omp.h>
 #include "function.h"
 
 //-----------------------------------------------------------
@@ -17,27 +17,23 @@
 //-----------------------------------------------------------
 int main (int argc, char *argv[])
 {
- 
+ /*
   // noms des fichiers d'entrée et de sortie
   char *filename=argv[1];
   char *file_out=argv[2];
-
   // pointeurs vers les matrices pour l'intégration temporelle
   float *T;
   float *Tdt;
   float *swap;
-
   // dimension de matrice, valeur maximale
   int v;  // max  value in matrix
   int rw; // row size
   int cl; // column size
-
   // vérification des arguments d'entrée
   if (argc != 3)
     {  fprintf(stderr,"Input parameters missing:\n./program_name <inpout.pgm> <output.pgm>\n");
       return(0);
     }
-
   
   //-------------------------------------------------------------
   // OPEN DATA FILE AND ALLOCATE INPUT IMAGE MEMORY (float precision)
@@ -55,8 +51,22 @@ int main (int argc, char *argv[])
   float dt = 0.01;
   memcpy(Tdt,T,sizeof(float)*rw*cl);
   double  t0 = omp_get_wtime ();     
-
   // A COMPLETER SELON LE DERNIER COURS :-)
+  
+   
+  double  t1 = omp_get_wtime ();
+  double  temps_reel=t1-t0;
+  printf( " temps  reel %lf : \n", temps_reel);
+  
+  //-------------------------------------------------------------
+  // WRITE RESULT IN A PGN IMAGE 
+  //-------------------------------------------------------------
+   writeimg(file_out, Tdt, rw, cl, v);
+   free(Tdt);
+   free(T);
+   return(0);*/
+
+    double t1 = omp_get_wtime();
     float u[] = {0,0,0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0};
     int size = 21;
     int tempsTotal = 2;
@@ -71,17 +81,6 @@ int main (int argc, char *argv[])
         printf(" %.3f ", u[i]);
     }
     printf(" \n ");
-  
-   
-  double  t1 = omp_get_wtime ();
-  double  temps_reel=t1-t0;
-  printf( " temps  reel %lf : \n", temps_reel);
-  
-  //-------------------------------------------------------------
-  // WRITE RESULT IN A PGN IMAGE 
-  //-------------------------------------------------------------
-   writeimg(file_out, Tdt, rw, cl, v);
-   free(Tdt);
-   free(T);
-   return(0);
+    double t2 = omp_get_wtime();
+    printf("Temps Total = %lf\n", t2-t1);
 }
