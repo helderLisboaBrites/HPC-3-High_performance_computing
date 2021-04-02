@@ -97,6 +97,6 @@ int main (int argc, char *argv[])
   printf("Moyenne de temps 1D : %lf \n",som/MOYENNE);
   printf("Moyenne de temps 1D_déroulage_parallel : %lf \n",som1/MOYENNE);
   printf("Moyenne de temps 1D_parallel : %lf \n",som2/MOYENNE);
-  #endif 
+  #endif
    return(0);
 }
