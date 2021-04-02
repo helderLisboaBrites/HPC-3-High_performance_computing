@@ -26,19 +26,3 @@ ctype.h
 math.h
 -
 
-/root/HPC-3-High_performance_computing/Partie 2 - Eva Dokladalova : Projet parallélisation et accélération de l'équation de la chaleur/main.c
-stdio.h
--
-sys/types.h
--
-stdlib.h
--
-stdint.h
--
-string.h
--
-omp.h
-/root/HPC-3-High_performance_computing/Partie 2 - Eva Dokladalova : Projet parallélisation et accélération de l'équation de la chaleur/omp.h
-function.h
-/root/HPC-3-High_performance_computing/Partie 2 - Eva Dokladalova : Projet parallélisation et accélération de l'équation de la chaleur/function.h
-

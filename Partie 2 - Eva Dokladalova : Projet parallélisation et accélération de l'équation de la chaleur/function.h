@@ -24,11 +24,15 @@ float * readFromData(char *, int );
 void print_1D_Array(float* , int );
 void f_1D(float *, float ,int  );
 
-void f_1D_parallele(float *, float ,int  );
+void f_1D_parallel(float *, float ,int  );
+void f_1D_parallel_static(float *, float ,int  );
+void f_1D_deroulage(float *, float ,int  );
+void f_1D_deroulage_parallel(float *, float ,int  );
 
 void f_2D(float **, float ,int,int  );
 
 void print_2D_Array(float** , int ,int);
+
 #endif
 
 
