@@ -12,7 +12,7 @@
 #include <omp.h>
 #include "function.h"
 #define QUESTION_1D
-#define MOYENNE 5
+#define MOYENNE 1
 //-----------------------------------------------------------
 // MAIN FUNCTION
 //-----------------------------------------------------------
@@ -22,22 +22,11 @@ int main (int argc, char *argv[])
   // noms des fichiers d'entrée et de sortie
   char *filename=argv[1];
   char *file_out=argv[2];
-  /** // pointeurs vers les matrices pour l'intégration temporelle
-  float *T;
-  float **Tdt;
-  float *swap;
-  // dimension de matrice, valeur maximale
-  int v;  // max  value in matrix
-  int rw; // row size
-  int cl; // column size
-  // vérification des arguments d'entrée
-  **/
-  if (argc != 3)
-    {  fprintf(stderr,"Input parameters missing:\n./program_name <inpout.pgm> <output.pgm>\n");
-      return(0);
-    }
-  
+ 
+
+  // A COMPLETER SELON LE DERNIER COURS :-)
   #ifdef QUESTION_1D
+    
     int tempsTotal = 2;
     float deltaT=0.001;
        
@@ -98,5 +87,67 @@ int main (int argc, char *argv[])
   printf("Moyenne de temps 1D_déroulage_parallel : %lf \n",som1/MOYENNE);
   printf("Moyenne de temps 1D_parallel : %lf \n",som2/MOYENNE);
   #endif
+
+
+  #ifdef QUESTION_2D
+
+   /** // pointeurs vers les matrices pour l'intégration temporelle
+  float *T;
+  float **Tdt;
+  float *swap;
+  // dimension de matrice, valeur maximale
+  int v;  // max  value in matrix
+  int rw; // row size
+  int cl; // column size
+  // vérification des arguments d'entrée
+  **/
+  if (argc != 3)
+    {  fprintf(stderr,"Input parameters missing:\n./program_name <inpout.pgm> <output.pgm>\n");
+      return(0);
+    }
+  
+  
+  //-------------------------------------------------------------
+  // OPEN DATA FILE AND ALLOCATE INPUT IMAGE MEMORY (float precision)
+  //-------------------------------------------------------------
+  T = readimg(filename, &cl, &rw, &v);
+  // allocation de 
+  Tdt = (float **) calloc (rw,sizeof(float*));
+  for(int i = 0; i<rw; i++){ 
+    Tdt[i] = calloc(cl, sizeof(float));
+    memcpy(Tdt[i],&T[i*cl],sizeof(float)*cl);
+    }
+  //print_2D_Array(Tdt,rw,cl);
+  //-------------------------------------------------------------
+  // PUT HERE THE NUMERICAL SOLUTION OF HEAT EQUATION
+  // complete variables necessary for for the numerical scheme computing
+  //-------------------------------------------------------------
+  int i;
+  int j;
+  int it;
+  float dt = 0.01;
+  //memcpy(Tdt,T,sizeof(float)*rw*cl);
+  //-------------------------------------------------------------
+  // WRITE RESULT IN A PGN IMAGE 
+  //-------------------------------------------------------------
+   float * array =(float*) calloc(rw*cl,sizeof(float));
+   for(int i = 0; i<rw; i++){
+     memcpy(&array[i*cl],Tdt[i],sizeof(float)*cl);
+   }
+   /*
+   print_2D_Array(Tdt,rw,cl);
+   for(int i=0; i<rw; i++){
+     for (int j=0; j<cl;j++)
+        printf("%.3f, ",array[i*cl+j]);
+      printf("\n");
+   }
+   printf("%d -- %d\n", rw,cl);
+   */
+   writeimg(file_out, array, cl, rw, v);
+   free(Tdt);
+   free(T);
+
+   #endif
+   
    return(0);
 }

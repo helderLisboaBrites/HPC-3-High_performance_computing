@@ -147,14 +147,14 @@ void f_1D_parallel(float * u,float deltaT, int size)
     u_tmp[size] = u[size];
     //calcul 
     omp_set_num_threads(4);
-    #pragma omp parallel for
+    #pragma omp parallel for 
     for(int x = 1; x<size-1; x++ )
     {
         u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
     }
     
     //copie tableau
-    #pragma omp parallel for
+    #pragma omp parallel for 
     for(int x = 0; x<size; x++ )
     {
         u[x]=u_tmp[x];
@@ -233,7 +233,7 @@ void f_1D_deroulage_parallel(float * u,float deltaT, int size)
     u_tmp[size] = u[size];
     //calcul 
     omp_set_num_threads(4);
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for 
     for(int x = 1; x<size-1; x=x+4 )
     {   
       float u0 = u[x-1];
@@ -267,7 +267,7 @@ void f_2D(float ** u, float  deltaT,int Xsize,int Ysize )
 {
   float** u_tmp = (float**) calloc(Xsize, sizeof(float*));
   for(int i = 0; i<Xsize; i++) u_tmp[i] = calloc(Ysize, sizeof(float));
-
+/*
   //calcul 
   for(int x = 0; x<Xsize-1; x++ )
   {
@@ -291,14 +291,33 @@ void f_2D(float ** u, float  deltaT,int Xsize,int Ysize )
       }
     }
   }
-  /*
-  printf(" ----\n ");
-  //print tableau valeurs
-  for(int i =0; i<size; i++){
-      printf(" %.3f ", u_tmp[i]);
-  }
-  printf("---- \n ");
 */
+  //pixel non bord
+  for(int x = 1; x<Xsize-1; x++)
+    for(int y =1; y<Ysize-1; y++)
+        u_tmp[x][y] = u[x][y]+ deltaT*(u[x+1][y] + u[x-1][y]+u[x][y+1]+u[x][y-1] - 4*u[x][y]) / 4;
+  //pixels bord en gauche
+  for(int x = 1; x<Xsize-1; x++)
+        u_tmp[x][0] = u[x][0]+ deltaT*(u[x+1][0] + u[x-1][0]+u[x][0]+u[x][0] - 4*u[x][0]) / 4;
+  //pixels bord en droit
+  for(int x = 1; x<Xsize-1; x++)
+        u_tmp[x][Ysize-1] = u[x][Ysize-1]+ deltaT*(u[x+1][Ysize-1] + u[x-1][Ysize-1]+u[x][Ysize-1]+u[x][Ysize-1] - 4*u[x][Ysize-1]) / 4;
+
+  //pixels bord en haut
+  for(int y =1; y<Ysize-1; y++)
+        u_tmp[0][y] = u[0][y]+ deltaT*(u[0][y] + u[0][y]+u[0][y+1]+u[0][y-1] - 4*u[0][y]) / 4;
+  //pixels bord en bas
+  for(int y =1; y<Ysize-1; y++)
+        u_tmp[Xsize-1][y] = u[Xsize-1][y]+ deltaT*(u[Xsize-1][y] + u[Xsize-1][y]+u[Xsize-1][y+1]+u[Xsize-1][y-1] - 4*u[Xsize-1][y]) / 4;
+
+  //les 4 coins
+  u_tmp[0][0] = 0;
+  u_tmp[Xsize-1][Ysize-1] = 0;
+  u_tmp[Xsize-1][0] = 0;
+  u_tmp[0][Ysize-1] = 0;
+
+
+
   //copie tableau
   for(int x = 0; x<Xsize; x++ )
   {
