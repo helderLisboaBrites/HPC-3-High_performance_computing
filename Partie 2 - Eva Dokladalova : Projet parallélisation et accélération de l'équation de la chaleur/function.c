@@ -6,7 +6,7 @@
  */
 
 #include "function.h"
-#include "omp.h"
+#include <omp.h>
 //------------------------------------------------------------------
 // ONLY FOR PGN IMAGES type P2 !!!
 //------------------------------------------------------------------
@@ -139,7 +139,7 @@ void f_1D(float * u,float deltaT, int size)
     free(u_tmp);
 }
 
-void f_1D_parallele(float * u,float deltaT, int size)
+void f_1D_parallel(float * u,float deltaT, int size)
 {
     float* u_tmp = (float*) calloc(size, sizeof(float));
 
@@ -148,6 +148,31 @@ void f_1D_parallele(float * u,float deltaT, int size)
     //calcul 
     omp_set_num_threads(4);
     #pragma omp parallel for 
+    for(int x = 1; x<size-1; x++ )
+    {
+        u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
+    }
+    
+    //copie tableau
+    #pragma omp parallel for 
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+        //memcpy
+    }
+
+    free(u_tmp);
+}
+
+void f_1D_parallel_static(float * u,float deltaT, int size)
+{
+    float* u_tmp = (float*) calloc(size, sizeof(float));
+
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    omp_set_num_threads(4);
+    #pragma omp parallel for schedule(static)
     for(int x = 1; x<size-1; x++ )
     {
         u_tmp[x] = u[x]+ deltaT*(u[x+1]-2*u[x]+u[x-1])/2;
@@ -164,7 +189,78 @@ void f_1D_parallele(float * u,float deltaT, int size)
     free(u_tmp);
 }
 
+void f_1D_deroulage(float * u,float deltaT, int size)
+{
+    float* u_tmp = (float*) calloc(size, sizeof(float));
 
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    
+    for(int x = 1; x<size-1; x=x+4 )
+    {   
+      float u0 = u[x-1];
+      float u1 = u[x];
+      float u2 = u[x+1];
+      float u3 = u[x+2];
+      float u4 = u[x+3];
+      float u5 = u[x+4];
+      u_tmp[x]  = u1+ deltaT*(u2-2*u1+u0)/2;
+      u_tmp[x+1]= u2+ deltaT*(u3-2*u2+u1)/2;
+      u_tmp[x+2]= u3+ deltaT*(u4-2*u3+u2)/2;
+      u_tmp[x+3]= u4+ deltaT*(u5-2*u4+u3)/2;
+ 
+    }
+
+
+    //copie tableau
+    #pragma omp parallel for
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+        //memcpy
+    }
+
+    free(u_tmp);
+
+}
+
+void f_1D_deroulage_parallel(float * u,float deltaT, int size)
+{
+    float* u_tmp = (float*) calloc(size, sizeof(float));
+
+    u_tmp[0] = u[0];
+    u_tmp[size] = u[size];
+    //calcul 
+    omp_set_num_threads(4);
+    #pragma omp parallel for 
+    for(int x = 1; x<size-1; x=x+4 )
+    {   
+      float u0 = u[x-1];
+      float u1 = u[x];
+      float u2 = u[x+1];
+      float u3 = u[x+2];
+      float u4 = u[x+3];
+      float u5 = u[x+4];
+      u_tmp[x]  = u1+ deltaT*(u2-2*u1+u0)/2;
+      u_tmp[x+1]= u2+ deltaT*(u3-2*u2+u1)/2;
+      u_tmp[x+2]= u3+ deltaT*(u4-2*u3+u2)/2;
+      u_tmp[x+3]= u4+ deltaT*(u5-2*u4+u3)/2;
+ 
+    }
+
+
+    //copie tableau
+    #pragma omp parallel for
+    for(int x = 0; x<size; x++ )
+    {
+        u[x]=u_tmp[x];
+        //memcpy
+    }
+
+    free(u_tmp);
+
+}
 
 
 void f_2D(float ** u, float  deltaT,int Xsize,int Ysize )
